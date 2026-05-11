@@ -3,7 +3,6 @@
 A minimal Python project that connects an LLM (`ChatGroq`) to MCP tools via `mcp-use`, then runs an interactive terminal chat with conversation memory.
 
 ## Features
-
 - Interactive chat loop in terminal.
 - Memory-enabled agent (`memory_enabled=True`).
 - Built-in commands:
