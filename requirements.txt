@@ -1,3 +1,2 @@
 langchain-groq
-langchain-mcp-adapters
-mcp
+mcp-use
