@@ -104,6 +104,21 @@ curl -s -X POST http://127.0.0.1:8000/rollback \
   -d '{"app_name":"demo","namespace":"default"}'
 ```
 
+## Screenshots (Browser Proof)
+
+### Swagger Home
+![Swagger Home](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.49.55_PM-41420d66-ff45-4088-97e8-2ec27b25c83d.png)
+
+### Deploy Endpoint - Request Form
+![Deploy Request Form](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.50.06_PM-ff951ccd-1d31-47b5-9068-16e362e35e98.png)
+
+### Deploy Endpoint - Execute / cURL
+![Deploy Execute Curl](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.50.15_PM-41fd2a15-6d66-4ad8-85a1-bb359a33dca4.png)
+
+### Deploy Endpoint - Response Block
+![Deploy Response Block](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.50.24_PM-4c4c198a-fd0b-41c4-8ea9-c8dbaf18d39b.png)
+
+
 ## Technology Stack
 
 - **Programming Language**: Python
