@@ -9,6 +9,30 @@ A **FastAPI** service that exposes DevOps operations as authenticated HTTP endpo
 - **Authentication**: Role-based access control (Admin, Deployer, Viewer) via API keys or JWT.
 - **Metrics**: Built-in Prometheus `/metrics` endpoint.
 
+## System Architecture
+
+```text
+User / AI Agent / GitHub Actions
+        ↓
+   API Server (FastAPI) — auth.py, app.py
+        ↓
+   Async job queue — jobs.py
+        ↓
+   Tool Layer — tools/deploy.py, tools/logs.py, tools/rollback.py
+        ↓
+   Kubernetes client — k8s_client.py
+        ↓
+   Kubernetes Cluster
+```
+
+## Tech Stack
+
+- **Language**: Python 3.10+
+- **API Framework**: FastAPI, Uvicorn, Pydantic
+- **Auth**: PyJWT (Bearer Tokens) & API Keys
+- **Kubernetes**: `kubernetes` Python SDK
+- **Metrics**: `prometheus-client`
+
 ## Real usage and demos
 
 Below is a recording of an AI agent interacting with the Server's Swagger UI to deploy an application, monitor job status, retrieve logs, and trigger a rollback:
