@@ -5,8 +5,18 @@ build/
 dist/
 wheels/
 *.egg-info
+.pytest_cache/
+.mypy_cache/
+.coverage
+.coverage.*
 .env
 *.env
+
 # Virtual environments
-.venv
-.playwright-mcp
+.venv/
+.playwright-mcp/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store

@@ -1,78 +1,192 @@
-# MCP Server Chat Demo
+# DevOps MCP Server (Python) — Automated Deployment & Monitoring
 
-A minimal Python project that connects an LLM (`ChatGroq`) to MCP tools via `mcp-use`, then runs an interactive terminal chat with conversation memory.
+## Project Title
 
-## Features
-- Interactive chat loop in terminal.
-- Memory-enabled agent (`memory_enabled=True`).
-- Built-in commands:
-  - `exit` to quit.
-  - `clear` to clear conversation history.
-- MCP servers loaded from `brower_mcp.json`:
-  - Playwright MCP
-  - DuckDuckGo Search MCP
+**DevOps MCP Server using Python for Automated Deployment and Monitoring**
 
-## Project Structure
+## Abstract
 
-- `app.py` - main async chat application.
-- `brower_mcp.json` - MCP server configuration.
-- `pyproject.toml` - project metadata and dependencies.
-- `requirements.txt` - minimal dependency list.
-- `main.py` - simple placeholder entry script.
+The DevOps MCP (Model Context Protocol) Server is a backend system designed to expose DevOps operations as structured, callable tools that can be invoked by AI systems or external clients. The server acts as an intermediary between user intent and infrastructure execution by translating high-level commands into concrete operations on containerized environments.
 
-## Prerequisites
+This project leverages Kubernetes and Docker to automate application deployment, log retrieval, and rollback mechanisms through a Python-based API interface.
 
-- Python `3.11+`
-- Node.js and npm (required because MCP servers are started with `npx`)
-- A Groq API key
+## Objectives
 
-## Setup
+- **Expose DevOps functionalities as structured APIs (tools)**: deployment, log retrieval, rollback
+- **Automate deployment and management of containerized applications** on Kubernetes
+- **Enable seamless interaction between AI systems and infrastructure** via callable endpoints
+- **Ensure safe and controlled execution** of DevOps operations
 
-1. Clone the repository and enter the directory.
-2. Create a virtual environment.
-3. Install dependencies.
-4. Create a `.env` file with your API key.
+## Problem Statement
 
-Example:
+Modern DevOps workflows require engineers to manually execute commands using CLI tools and dashboards. This process can be:
+
+- **Time-consuming**
+- **Error-prone**
+- **Hard to integrate** with AI-driven systems
+
+There is a need for a system that abstracts infrastructure operations into programmable and intelligent interfaces.
+
+## Proposed Solution
+
+This repository implements a Python-based server that:
+
+- Accepts structured requests (e.g., deploy application, fetch logs, trigger rollback)
+- Routes requests to predefined tool modules
+- Uses the Kubernetes Python client to execute operations on a cluster
+- Returns structured responses suitable for AI agents and automation clients
+
+## System Architecture
+
+High-level flow:
+
+```text
+User / AI Agent
+        ↓
+   API Server (FastAPI)
+        ↓
+   Tool Layer (deploy, logs, rollback)
+        ↓
+Kubernetes Client (Python SDK)
+        ↓
+   Kubernetes Cluster
+```
+
+## Core Functional Modules
+
+### Deployment Module
+
+**File**: `tools/deploy.py`
+
+- Accepts app name, container image, namespace, and replicas
+- Creates a Kubernetes `Deployment`
+- Returns a structured deployment result payload
+
+### Logging Module
+
+**File**: `tools/logs.py`
+
+- Lists pods in a namespace and finds pods matching `app_name`
+- Fetches logs for the first matching pod
+- Returns log text
+
+### Rollback Module
+
+**File**: `tools/rollback.py`
+
+- Triggers a rollout-like restart by patching the Deployment pod template annotations
+- Returns a structured response indicating rollback trigger
+
+## API Surface (Callable Tools)
+
+**FastAPI app**: `app.py`
+
+- `GET /health`: health check
+- `POST /deploy`: deploy an app
+- `POST /logs`: fetch logs for an app
+- `POST /rollback`: trigger rollback/restart for an app
+
+Example requests:
 
 ```bash
-python3 -m venv .venv
+curl -s http://127.0.0.1:8000/health
+
+curl -s -X POST http://127.0.0.1:8000/deploy \
+  -H "Content-Type: application/json" \
+  -d '{"name":"demo","image":"nginx:latest","namespace":"default","replicas":1}'
+
+curl -s -X POST http://127.0.0.1:8000/logs \
+  -H "Content-Type: application/json" \
+  -d '{"app_name":"demo","namespace":"default"}'
+
+curl -s -X POST http://127.0.0.1:8000/rollback \
+  -H "Content-Type: application/json" \
+  -d '{"app_name":"demo","namespace":"default"}'
+```
+
+## Technology Stack
+
+- **Programming Language**: Python
+- **API Framework**: FastAPI
+- **Containerization**: Docker (target workloads)
+- **Orchestration**: Kubernetes
+- **Local Testing**: Minikube / Kind (recommended)
+
+## Setup & Run
+
+### Prerequisites
+
+- Python 3.10+ recommended
+- A working Kubernetes context in your kubeconfig (e.g. Minikube/Kind)
+
+### Install dependencies
+
+```bash
+python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Add your environment variable in `.env`:
-
-```env
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-## Run
-
-Start the interactive memory chat:
+### Start the server
 
 ```bash
-python app.py
+uvicorn app:app --reload
 ```
 
-When prompted:
+Then open the interactive docs at `http://127.0.0.1:8000/docs`.
 
-- Type your message and press Enter.
-- Type `clear` to reset memory.
-- Type `exit` to stop.
+## Security Considerations (Recommended Enhancements)
 
-## MCP Configuration
+For safe operation in real environments, add:
 
-The app reads MCP servers from `brower_mcp.json`.
+- **Role-based access control (RBAC)** and least-privilege Kubernetes service accounts
+- **Namespace restrictions** (allowlist) to prevent cross-namespace operations
+- **Input validation & sanitization** (expand current validation rules)
+- **Audit logging** for every operation (who/what/when/where)
 
-Current config uses:
+## Future Enhancements
 
-- `@playwright/mcp@latest`
-- `duckduckgo-mcp-server`
+- Integration with CI/CD tools (e.g., GitHub Actions)
+- Monitoring with Prometheus and Grafana
+- Multi-cluster support
+- Natural language interface via AI agents
+- Version-based and progressive rollback strategies (canary/blue-green)
+## Local Cluster Setup (Minikube + Docker Desktop)
 
-If you add more MCP servers, update `brower_mcp.json` accordingly.
+If no Kubernetes cluster is available locally:
 
-## Notes
+```bash
+brew install minikube
+open -a Docker
+minikube start --driver=docker
+kubectl config use-context minikube
+kubectl get nodes
+```
 
-- `app.py` is the actual runtime entrypoint for this project.
-- `main.py` currently prints a placeholder message and is not used for the chat workflow.
+`kubectl` must be able to connect before calling `/deploy`, `/logs`, or `/rollback`.
+
+## End-to-End Test Flow
+
+```bash
+curl -s http://127.0.0.1:8000/health
+
+curl -s -X POST http://127.0.0.1:8000/deploy \
+  -H "Content-Type: application/json" \
+  -d '{"name":"demo","image":"nginx:latest","namespace":"default","replicas":1}'
+
+kubectl rollout status deploy/demo -n default
+
+curl -s -X POST http://127.0.0.1:8000/logs \
+  -H "Content-Type: application/json" \
+  -d '{"app_name":"demo","namespace":"default"}'
+
+curl -s -X POST http://127.0.0.1:8000/rollback \
+  -H "Content-Type: application/json" \
+  -d '{"app_name":"demo","namespace":"default"}'
+```
+
+Cleanup:
+
+```bash
+kubectl delete deploy demo -n default --ignore-not-found
+```

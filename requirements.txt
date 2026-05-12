@@ -1,2 +1,4 @@
-langchain-groq
-mcp-use
+fastapi
+kubernetes
+pydantic
+uvicorn
