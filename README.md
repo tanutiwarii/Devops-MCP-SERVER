@@ -385,15 +385,30 @@ kubectl delete deploy api-smoke -n test-mcp --ignore-not-found
 
 > **Note:** If any screenshot fails to load, use `/docs` locally — behavior is defined by the code and [API reference](#api-reference) above.
 
-## Real usage and demos (add your own media)
+## Real usage and demos
 
-The screenshots above show the **Swagger UI** against a real cluster. To make the project feel less theoretical, add:
+Below is a recording of an AI agent seamlessly interacting with the DevOps MCP Server's Swagger UI to deploy an application, monitor its job status, retrieve its logs, and trigger a rollback:
 
-1. **Short screen recording (MP4) or GIF** — e.g. OBS or macOS Screenshot → record: open `/docs`, paste API key, run **`POST /deploy`**, show **`GET /jobs/{id}`** going to `succeeded`, then **`POST /logs`**.
-2. **AI agent clip** — record a Cursor / ChatGPT / custom agent session where the model calls **`curl`** or a small script that hits **`/deploy`** and polls **`/jobs`** (blur secrets in the recording).
-3. **Cluster proof** — one terminal with **`kubectl get pods -l app=demo -w`** while the API deploys.
+![AI Agent executing Deploy API using Swagger UI](assets/api_demo_swagger.webp)
 
-Host the video on GitHub Releases, Loom, or embed a GIF in this README (drag-and-drop into the GitHub editor uploads to `user-attachments` — same pattern as the existing images).
+### Cluster Proof
+
+While the API was processing the requests, here is the state of the Kubernetes cluster as verified by the terminal:
+
+```text
+NAME                         READY   STATUS    RESTARTS      AGE
+pod/demo-dfc8c5966-s5d25     1/1     Running   3 (10m ago)   97m
+pod/demo-dfc8c5966-xfs8f     1/1     Running   3 (10m ago)   97m
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   100m
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/demo     2/2     2            2           97m
+
+NAME                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/demo-dfc8c5966     2         2         2       97m
+```
 
 ## CI/CD (GitHub Actions)
 

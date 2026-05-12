@@ -1,0 +1,15 @@
+NAME                         READY   STATUS             RESTARTS      AGE
+pod/demo-dfc8c5966-s5d25     1/1     Running            3 (10m ago)   97m
+pod/demo-dfc8c5966-xfs8f     1/1     Running            3 (10m ago)   97m
+pod/string-9977c6486-n6tdk   0/1     ImagePullBackOff   0             62m
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   100m
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/demo     2/2     2            2           97m
+deployment.apps/string   0/1     1            0           62m
+
+NAME                               DESIRED   CURRENT   READY   AGE
+replicaset.apps/demo-dfc8c5966     2         2         2       97m
+replicaset.apps/string-9977c6486   1         1         0       62m
