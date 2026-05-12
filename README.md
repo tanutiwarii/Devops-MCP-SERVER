@@ -3,10 +3,11 @@
 A **FastAPI** service that exposes DevOps operations as authenticated HTTP endpoints. It allows AI agents, CI/CD pipelines, or developers to easily trigger and monitor Kubernetes deployments, fetch pod logs, and perform rollbacks.
 
 ## Features
+- **Model Context Protocol (MCP)**: Exposes operations natively as MCP tools via Server-Sent Events (SSE).
 - **Async Deployments**: Start a deployment and track its status via job polling.
 - **Log Retrieval**: Fetch logs using Kubernetes label selectors.
 - **Rollbacks**: Revert a deployment to a previous state using ReplicaSet revision history.
-- **Authentication**: Role-based access control (Admin, Deployer, Viewer) via API keys or JWT.
+- **Authentication**: Role-based access control (Admin, Deployer, Viewer) via API keys or JWT (for REST endpoints).
 - **Metrics**: Built-in Prometheus `/metrics` endpoint.
 
 ## System Architecture
@@ -77,6 +78,23 @@ cp .env.example .env
 uvicorn app:app --reload
 ```
 Access the interactive API docs at `http://127.0.0.1:8000/docs`.
+
+## Model Context Protocol (MCP) Support
+
+This service natively supports the Model Context Protocol (MCP) using the SSE transport. You can connect compatible MCP clients (like Claude Desktop or custom LangChain/LlamaIndex agents) directly to the server:
+
+**SSE Connection URL:**
+```text
+http://127.0.0.1:8000/mcp/sse
+```
+
+The server exposes the following MCP Tools to connected LLMs:
+- `deploy_tool`: Triggers a Kubernetes deployment and returns an async job ID.
+- `check_job_tool`: Checks the status of an active deployment job.
+- `fetch_logs_tool`: Retrieves logs for a labeled pod.
+- `rollback_tool`: Reverts a deployment to a previous ReplicaSet revision.
+
+*(Note: The MCP endpoints do not currently require the X-API-Key used by the standard REST API)*
 
 ## API Reference (Quick Look)
 

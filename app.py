@@ -15,6 +15,7 @@ from settings import load_settings
 from tools.deploy import deploy_app
 from tools.logs import get_logs
 from tools.rollback import rollback_deployment
+from mcp.server.fastmcp import FastMCP
 
 logging.basicConfig(
     level=logging.INFO,
@@ -38,6 +39,61 @@ app = FastAPI(
     lifespan=lifespan,
 )
 app.add_middleware(PrometheusMiddleware)
+
+# --- MCP Server Setup ---
+mcp = FastMCP("devops-mcp-server")
+
+@mcp.tool()
+async def deploy_tool(name: str, image: str, namespace: str = "default", replicas: int = 1) -> str:
+    """Trigger a Kubernetes deployment and return the job_id. Use check_job to poll status."""
+    rec = await JOBS.create(
+        "deploy",
+        {
+            "name": name,
+            "image": image,
+            "namespace": namespace,
+            "replicas": replicas,
+        },
+    )
+    asyncio.create_task(
+        _deploy_worker(rec.job_id, name, image, namespace, replicas),
+    )
+    return f"Deployment triggered. Job ID: {rec.job_id}"
+
+@mcp.tool()
+def fetch_logs_tool(app_name: str, namespace: str = "default") -> str:
+    """Fetch logs for a specific pod by app_name label."""
+    out = get_logs(app_name, namespace=namespace)
+    if out is None:
+        return f"No pod found with label app={app_name!r} in namespace {namespace!r}."
+    return out
+
+@mcp.tool()
+def rollback_tool(app_name: str, revision: int = 0, namespace: str = "default") -> str:
+    """Roll back a deployment to a previous revision. revision=0 means previous."""
+    try:
+        res = rollback_deployment(app_name, namespace=namespace, revision=revision)
+        return f"Rolled back {app_name} to revision {res['to_revision']}."
+    except Exception as e:
+        return f"Rollback failed: {e}"
+
+@mcp.tool()
+async def check_job_tool(job_id: str) -> str:
+    """Check the status of an async deploy job."""
+    rec = await JOBS.get(job_id)
+    if rec is None:
+        return "Job not found."
+    return f"Status: {rec.status.value}\nDetail: {rec.detail}\nResult: {rec.result}"
+
+app.mount("/mcp", mcp.sse_app())
+# ------------------------
+
+from fastapi.responses import RedirectResponse
+
+@app.get("/", include_in_schema=False)
+def root():
+    """Redirect to the Swagger UI documentation."""
+    return RedirectResponse(url="/docs")
 
 
 class DeployRequest(BaseModel):
