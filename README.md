@@ -365,26 +365,6 @@ kubectl delete deploy demo -n default --ignore-not-found
 kubectl delete deploy api-smoke -n test-mcp --ignore-not-found
 ```
 
-## Screenshots (browser proof)
-
-### Swagger home
-
-<img width="1440" height="248" alt="Screenshot 2026-05-12 at 3 49 55 PM" src="https://github.com/user-attachments/assets/9dbdeb15-25e8-42bd-a1d1-6024b4ba671d" />
-
-### Deploy endpoint — request form
-
-<img width="1440" height="665" alt="Screenshot 2026-05-12 at 3 50 06 PM" src="https://github.com/user-attachments/assets/1cf5c5c3-9918-4cc5-9248-a08e2e9f581f" />
-
-### Deploy endpoint — execute / cURL
-
-<img width="1440" height="900" alt="Screenshot 2026-05-12 at 3 50 15 PM" src="https://github.com/user-attachments/assets/7b464253-9866-4e31-84e9-d47ade77a986" />
-
-### Deploy endpoint — response block
-
-<img width="1440" height="700" alt="Screenshot 2026-05-12 at 3 50 24 PM" src="https://github.com/user-attachments/assets/319bca08-e330-49ec-a65a-2a06612a82a3" />
-
-> **Note:** If any screenshot fails to load, use `/docs` locally — behavior is defined by the code and [API reference](#api-reference) above.
-
 ## Real usage and demos
 
 Below is a recording of an AI agent seamlessly interacting with the DevOps MCP Server's Swagger UI to deploy an application, monitor its job status, retrieve its logs, and trigger a rollback:
