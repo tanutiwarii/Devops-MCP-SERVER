@@ -1,4 +1,7 @@
 fastapi
 kubernetes
+prometheus-client
 pydantic
+pyjwt
+python-dotenv
 uvicorn

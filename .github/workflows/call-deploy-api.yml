@@ -1,0 +1,64 @@
+# Example: invoke the DevOps MCP HTTP API from GitHub Actions (e.g. after a build).
+#
+# Configure repository secrets:
+#   DEVOPS_API_BASE   — e.g. https://devops-api.example.com  (no trailing slash)
+#   DEVOPS_API_KEY    — value matching a key in DEVOPS_API_KEYS on the server
+#
+# Tweak the JSON body to match your cluster (name, image, namespace, replicas).
+
+name: Call deploy API
+
+on:
+  workflow_dispatch:
+    inputs:
+      image:
+        description: "Container image to deploy"
+        required: true
+        default: "nginx:latest"
+      deployment_name:
+        description: "Kubernetes Deployment name (and app label)"
+        required: true
+        default: "demo"
+      namespace:
+        description: "Target namespace"
+        required: true
+        default: "default"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Submit async deploy job
+        env:
+          BASE: ${{ secrets.DEVOPS_API_BASE }}
+          API_KEY: ${{ secrets.DEVOPS_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${BASE:-}" && test -n "${API_KEY:-}" || { echo "Set DEVOPS_API_BASE and DEVOPS_API_KEY secrets"; exit 1; }
+          BODY=$(jq -nc \
+            --arg name "${{ github.event.inputs.deployment_name }}" \
+            --arg image "${{ github.event.inputs.image }}" \
+            --arg ns "${{ github.event.inputs.namespace }}" \
+            '{name:$name, image:$image, namespace:$ns, replicas:1}')
+          RESP=$(curl -sS -X POST "${BASE}/deploy" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: ${API_KEY}" \
+            -d "${BODY}")
+          echo "$RESP" | jq .
+          JOB_ID=$(echo "$RESP" | jq -r '.job_id')
+          test -n "$JOB_ID" && test "$JOB_ID" != "null"
+
+          for i in $(seq 1 60); do
+            ST=$(curl -sS "${BASE}/jobs/${JOB_ID}" -H "X-API-Key: ${API_KEY}" | jq -r '.status')
+            echo "job status: $ST"
+            if [ "$ST" = "succeeded" ]; then
+              curl -sS "${BASE}/jobs/${JOB_ID}" -H "X-API-Key: ${API_KEY}" | jq .
+              exit 0
+            fi
+            if [ "$ST" = "failed" ]; then
+              curl -sS "${BASE}/jobs/${JOB_ID}" -H "X-API-Key: ${API_KEY}" | jq .
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "Timeout waiting for job"; exit 1
