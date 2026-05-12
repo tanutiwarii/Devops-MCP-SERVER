@@ -107,7 +107,7 @@ curl -s -X POST http://127.0.0.1:8000/rollback \
 ## Screenshots (Browser Proof)
 
 ### Swagger Home
-![Swagger Home](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.49.55_PM-41420d66-ff45-4088-97e8-2ec27b25c83d.png)
+![Swagger Home]('/Users/tannutiwari/Downloads/screenshot/Screenshot 2026-05-12 at 3.49.55 PM.png')
 
 ### Deploy Endpoint - Request Form
 ![Deploy Request Form](/Users/tannutiwari/.cursor/projects/Users-tannutiwari-Downloads-Projects-MCP-Server/assets/Screenshot_2026-05-12_at_3.50.06_PM-ff951ccd-1d31-47b5-9068-16e362e35e98.png)
