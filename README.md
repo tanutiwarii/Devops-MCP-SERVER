@@ -389,7 +389,7 @@ kubectl delete deploy api-smoke -n test-mcp --ignore-not-found
 
 Below is a recording of an AI agent seamlessly interacting with the DevOps MCP Server's Swagger UI to deploy an application, monitor its job status, retrieve its logs, and trigger a rollback:
 
-![AI Agent executing Deploy API using Swagger UI](assets/api_demo_swagger.webp)
+![AI Agent executing Deploy API using Swagger UI](assets/api_demo_swagger.gif)
 
 ### Cluster Proof
 
