@@ -7,13 +7,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any
 
-
 class JobStatus(str, Enum):
     queued = "queued"
     running = "running"
     succeeded = "succeeded"
     failed = "failed"
-
 
 @dataclass
 class JobRecord:

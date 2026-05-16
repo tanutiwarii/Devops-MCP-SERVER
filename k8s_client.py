@@ -10,7 +10,6 @@ _core_v1: client.CoreV1Api | None = None
 def init_k8s_clients() -> tuple[client.AppsV1Api, client.CoreV1Api]:
     """
     Initialize Kubernetes API clients.
-
     Tries local kubeconfig first (Minikube/Kind/dev), then in-cluster config.
     """
     try:
